@@ -1,0 +1,13 @@
+<% provide(:title, @user.name) %>
+<div class="row">
+  <aside class="span4">
+    <section>
+      <h1>
+	 <!--app/helpers/users_helper.rb -->
+	 <%= gravatar_for @user %> 	<!-- gravatar is a free service gravatar.com that associates an email to an image, that way theres no need to upload images to db -->
+	 <%= @user.name %>
+      </h1>
+    </section>
+  </aside>
+</div>
+<%= @user.name %>, <%= @user.email %>

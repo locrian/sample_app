@@ -1,5 +1,7 @@
 SampleApp::Application.routes.draw do
- get "users/new" 
+ resources :users
+ 
+ # get "users/new" <-- we dont need this anymore since "resources :users" will generate the action required based on RESTful User resource
 
  #On changing the routes you must restart guard if you are using it with rspec and spork
  root to: 'static_pages#home'			#Before it was " get 'static_pages/home'  "
@@ -10,6 +12,7 @@ SampleApp::Application.routes.draw do
 
  match '/signup',  to: 'users#new'
 
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

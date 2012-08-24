@@ -2,11 +2,12 @@
 #
 # Table name: users
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  email      :string(255)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id              :integer          not null, primary key
+#  name            :string(255)
+#  email           :string(255)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  password_digest :string(255)
 #
 
 require 'spec_helper'
@@ -24,23 +25,23 @@ describe User do
   it { should respond_to(:authenticate) }
   it { should be_valid }
 
-  describe "when name is not present" do
+  describe "when name is not present" do	# Tests if the username is missing
     before { @user.name = " " }
     it { should_not be_valid }
   end
 
-  describe "when email is not present" do
+  describe "when email is not present" do	# Test if the password is missing
     before { @user.email = " " }
     it { should_not be_valid }
   end
 
-  describe "when name is too long" do
+  describe "when name is too long" do		# Test the size of the username
     before { @user.name = "a" * 51 }      	#Before the test it sets de variable name to "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" 
     it { should_not be_valid }
   end
 
-  describe "when email format is invalid" do
-    it "shuld be invalid" do
+  describe "when email format is invalid" do	# Test for invalid e-mail formats
+    it "should be invalid" do
       addresses = %w[user@lol,com user_at_lol.org exampe.lol@lol@teste_manhoso.com teste@teste+manhoso.com]
       addresses.each do |invalid_address|
         @user.email = invalid_address
@@ -49,7 +50,7 @@ describe User do
     end
   end
 
-  describe "when email format is valid" do
+  describe "when email format is valid" do	# Test for valid e-mail formats
     it "should be valid" do
       addresses = %w[user@lol.COM A_US-ER@f.b.org first.lst@foo.jp a+b@baz.cn]
       addresses.each do |valid_address|
@@ -59,7 +60,7 @@ describe User do
     end
   end
 
-  describe "when email adress is already taken" do
+  describe "when email adress is already taken" do	# Test for email duplication
     before do
       user_with_same_email = @user.dup
       user_with_same_email.email = @user.email.upcase 
@@ -69,22 +70,22 @@ describe User do
     it { should_not be_valid }
   end
 
-  describe "when password is not present" do
+  describe "when password is not present" do		# Test for missing password
     before { @user.password = @user.password_confirmation = " " }
     it { should_not be_valid }
   end
 
-  describe "when password doesn't match confirmation" do
+  describe "when password doesn't match confirmation" do	# Test for password mismatch
     before { @user.password_confirmation = "mismatch" }
     it { should_not be_valid }
   end
 
-  describe "when password confirmation is nil" do
-    before { @user.password_confirmation = nil }
+  describe "when password confirmation is nil" do		# Test for null password confirmation, by default Rails accept nil and do not compare 
+    before { @user.password_confirmation = nil }  		# the password and confirmation, so we need this test
     it { should_not be_valid }
   end
 
-  describe "return value of authenticate method" do
+  describe "return value of authenticate method" do		# Test to compare the submited password with username
     before { @user.save }
     let(:found_user) { User.find_by_email(@user.email) }
 
@@ -96,13 +97,23 @@ describe User do
       let(:user_for_invalid_password) { found_user.authenticate("invalid") }
 
       it { should_not == user_for_invalid_password }
-      specify { user_for_invalid_password.should be_false } 			#Same as It, but "sounds better" in the current statement
+      specify { user_for_invalid_password.should be_false } 			#Same as "It", but "sounds better" in the current statement
     end
   end
 
   describe "with a password that's to short" do
     before { @user.password = @user.password_confirmation = "a" * 5 }		#Specify the minimum size of the password to be 5
     it { should be_invalid }
+  end
+
+  describe "email address with mixed case" do					# Tests if the email is downcase before inserting into the database
+    let(:mixed_case_email) { "Foo@ExAMPle.CoM" }
+
+    it "should be saved as all lower-case" do
+      @user.email = mixed_case_email
+      @user.save
+      @user.reload.email.should == mixed_case_email.downcase
+    end
   end
 end
 
