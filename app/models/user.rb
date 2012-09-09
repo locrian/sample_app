@@ -9,6 +9,7 @@
 #  updated_at      :datetime         not null
 #  password_digest :string(255)
 #  remember_token  :string(255)
+#  admin           :boolean          default(FALSE)
 #
 
 class User < ActiveRecord::Base
@@ -16,6 +17,8 @@ class User < ActiveRecord::Base
 
  has_secure_password						# This method requires the column "password_digest" in database to auto-convert the provided 
 								# password to an encripted one
+ 
+ has_many :microposts, dependent: :destroy
 
  before_save { self.email.downcase! } 				# Also works the same as --> before_save { |user| user.email = email.downcase }
  before_save :create_remember_token
@@ -30,6 +33,11 @@ class User < ActiveRecord::Base
 
  validates :password, presence: true, length: { minimum: 6 }
  validates :password_confirmation, presence: true
+
+ def feed
+   # This is preliminary. See "Following users" for the full implementation.
+    Micropost.where("user_id = ?", id)
+ end
 
  private
     def create_remember_token

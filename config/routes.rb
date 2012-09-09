@@ -1,7 +1,7 @@
 SampleApp::Application.routes.draw do
  resources :users
- resources :sessions, only: [:new, :create, :destroy]
- 
+ resources :sessions,   only: [:new, :create, :destroy]
+ resources :microposts, only: [:create, :destroy] 
  # get "users/new" <-- we dont need this anymore since "resources :users" will generate the action required based on RESTful User resource
 
  #On changing the routes you must restart guard if you are using it with rspec and spork
